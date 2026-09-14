@@ -1,8 +1,3 @@
-Hello! 👋 It's great to hear from you.
-
-Here is the professional, fully-detailed README.md file for your project. It includes all the badges, tech stack breakdown, project context, motivation, and credits for zakariaelqannaa-dv.
-
-Markdown
 # 🎓 University Student & Faculty Academic Dashboard
 
 <p align="center">
