@@ -1,0 +1,132 @@
+{
+  "student": {
+    "id": "CS-2026-890",
+    "major": "Computer Science & Data Engineering",
+    "name": "Youssef Amrani",
+    "studyGoalHours": 30
+  },
+  "teachers": [
+    {
+      "id": "T01",
+      "color": "bg-pixel-primaryContainer text-pixel-onPrimary",
+      "department": "Computer Science",
+      "email": "a.benali@univ.edu",
+      "name": "Dr. Amina Benali",
+      "office": "Mon/Wed 14:00 - 16:00",
+      "subject": "Advanced Algorithms"
+    },
+    {
+      "id": "T02",
+      "color": "bg-pixel-secondaryContainer text-pixel-onSecondary",
+      "department": "Software Eng",
+      "email": "k.tazi@univ.edu",
+      "name": "Prof. Karim Tazi",
+      "office": "Tue/Thu 10:00 - 12:00",
+      "subject": "Distributed Databases"
+    },
+    {
+      "id": "T03",
+      "color": "bg-pixel-tertiaryContainer text-pixel-onTertiary",
+      "department": "Information Tech",
+      "email": "s.smith@univ.edu",
+      "name": "Dr. Sarah Smith",
+      "office": "Fri 09:00 - 11:30",
+      "subject": "Web Architecture"
+    },
+    {
+      "id": "T04",
+      "color": "bg-pixel-peachContainer text-pixel-onPeach",
+      "department": "Computer Science",
+      "email": "m.bennani@univ.edu",
+      "name": "Dr. Mehdi Bennani",
+      "office": "Mon/Thu 15:00 - 17:00",
+      "subject": "Data Structures"
+    }
+  ],
+  "courses": [
+    {
+      "id": "C01",
+      "code": "CS301",
+      "day": "Monday",
+      "end": "11:00",
+      "room": "Lab 3B",
+      "start": "09:00",
+      "teacherId": "T01",
+      "title": "Advanced Algorithms"
+    },
+    {
+      "id": "C02",
+      "code": "SE402",
+      "day": "Tuesday",
+      "end": "13:15",
+      "room": "Hall 204",
+      "start": "11:15",
+      "teacherId": "T02",
+      "title": "Distributed Databases"
+    },
+    {
+      "id": "C03",
+      "code": "IT205",
+      "day": "Wednesday",
+      "end": "16:00",
+      "room": "Lab 1A",
+      "start": "14:00",
+      "teacherId": "T03",
+      "title": "Web Architecture"
+    },
+    {
+      "id": "C04",
+      "code": "CS202",
+      "day": "Thursday",
+      "end": "12:00",
+      "room": "Room 102",
+      "start": "10:00",
+      "teacherId": "T04",
+      "title": "Data Structures"
+    },
+    {
+      "id": "C05",
+      "code": "CS301L",
+      "day": "Friday",
+      "end": "11:00",
+      "room": "Lab 3B",
+      "start": "09:00",
+      "teacherId": "T01",
+      "title": "Algorithms Practical Lab"
+    }
+  ],
+  "activities": [
+    {
+      "id": "ACT01",
+      "category": "Tech",
+      "color": "#1a73e8",
+      "hours": 12,
+      "icon": "fa-code",
+      "name": "Coding Side Projects"
+    },
+    {
+      "id": "ACT02",
+      "category": "Entertainment",
+      "color": "#6750a4",
+      "hours": 8,
+      "icon": "fa-gamepad",
+      "name": "Gaming & Esports"
+    },
+    {
+      "id": "ACT03",
+      "category": "Self-Improvement",
+      "color": "#006874",
+      "hours": 5,
+      "icon": "fa-book-open",
+      "name": "Reading & Research"
+    },
+    {
+      "id": "ACT04",
+      "category": "Sports",
+      "color": "#c2410c",
+      "hours": 6,
+      "icon": "fa-futbol",
+      "name": "Football & Gym"
+    }
+  ]
+}

@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelStudent - University Edition</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Outfit (Headers) & Inter (Body) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Data Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        pixel: {
+                            bg: '#f8f9fa',
+                            surface: '#ffffff',
+                            surfaceContainer: '#f0f4f9',
+                            primary: '#1a73e8',
+                            primaryContainer: '#d3e3fd',
+                            onPrimary: '#041e49',
+                            secondary: '#6750a4',
+                            secondaryContainer: '#e8def8',
+                            onSecondary: '#1d192b',
+                            tertiary: '#006874',
+                            tertiaryContainer: '#cce8cc',
+                            onTertiary: '#072711',
+                            peachContainer: '#fdedc8',
+                            onPeach: '#513800',
+                            errorContainer: '#f9dedc',
+                            onError: '#410e0b',
+                            outline: '#747775',
+                            border: '#e0e2ec'
+                        }
+                    },
+                    boxShadow: {
+                        'pixel-sm': '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+                        'pixel-md': '0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
+                        'pixel-lg': '0 12px 28px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-outfit { font-family: 'Outfit', sans-serif; }
+        
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Smooth View Fade Animation */
+        .view-content { transition: opacity 0.2s ease-in-out; }
+        .fade-in-up { animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col md:flex-row overflow-hidden text-gray-800 antialiased">
+
+    <!-- Mobile Navigation Bar Header -->
+    <div class="md:hidden bg-pixel-surface border-b border-pixel-border px-4 py-3 flex items-center justify-between shrink-0 z-30">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-2xl bg-pixel-primaryContainer text-pixel-onPrimary flex items-center justify-center">
+                <i class="fa-solid fa-graduation-cap text-base"></i>
+            </div>
+            <span class="font-outfit font-bold text-lg text-gray-900">PixelStudent</span>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-600">
+            <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-gray-900/40 z-30 hidden md:hidden backdrop-blur-xs transition-opacity"></div>
+
+    <!-- Main Sidebar Navigation -->
+    <aside id="app-sidebar" class="fixed md:static inset-y-0 left-0 w-72 bg-pixel-surfaceContainer border-r border-pixel-border flex flex-col justify-between p-4 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+        <div>
+            <!-- App Branding -->
+            <div class="flex items-center gap-3.5 px-3 py-4 mb-4">
+                <div class="w-11 h-11 rounded-2xl bg-pixel-primary text-white flex items-center justify-center shadow-pixel-sm">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-outfit font-bold text-xl text-gray-900 leading-tight">PixelStudent</h1>
+                    <span class="text-xs font-semibold text-pixel-primary bg-pixel-primaryContainer px-2.5 py-0.5 rounded-full inline-block mt-0.5">
+                        UniPortal v2.5
+                    </span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-1.5" id="nav-menu">
+                <button onclick="switchView('overview')" data-view="overview" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-full font-medium text-sm transition-all bg-pixel-primaryContainer text-pixel-onPrimary font-semibold shadow-xs">
+                    <i class="fa-solid fa-house-chimney w-5 text-center text-base"></i>
+                    <span>Overview & Stats</span>
+                </button>
+                <button onclick="switchView('timetable')" data-view="timetable" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-full font-medium text-sm text-gray-600 hover:bg-white/80 transition-all">
+                    <i class="fa-solid fa-calendar-days w-5 text-center text-base"></i>
+                    <span>Weekly Timetable</span>
+                </button>
+                <button onclick="switchView('faculty')" data-view="faculty" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-full font-medium text-sm text-gray-600 hover:bg-white/80 transition-all">
+                    <i class="fa-solid fa-chalkboard-user w-5 text-center text-base"></i>
+                    <span>Faculty Directory</span>
+                </button>
+                <button onclick="switchView('freetime')" data-view="freetime" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-full font-medium text-sm text-gray-600 hover:bg-white/80 transition-all">
+                    <i class="fa-solid fa-icons w-5 text-center text-base"></i>
+                    <span>Free Time Tracker</span>
+                </button>
+                <button onclick="switchView('database')" data-view="database" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-full font-medium text-sm text-gray-600 hover:bg-white/80 transition-all">
+                    <i class="fa-solid fa-database w-5 text-center text-base"></i>
+                    <span>Database Engine</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- System & Firebase Status Card -->
+        <div class="space-y-3">
+            <div class="bg-white p-3.5 rounded-3xl border border-pixel-border shadow-pixel-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sync Connection</span>
+                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Offline/Local
+                    </span>
+                </div>
+                <p class="text-xs text-gray-500 truncate" id="sync-status-desc">Initializing Firestore client...</p>
+            </div>
+
+            <!-- Student Profile Summary Tile -->
+            <div class="bg-white p-3.5 rounded-3xl border border-pixel-border flex items-center gap-3 shadow-pixel-sm">
+                <div class="w-10 h-10 rounded-full bg-pixel-primaryContainer text-pixel-onPrimary flex items-center justify-center font-bold font-outfit text-base">
+                    YA
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <h4 id="sb-student-name" class="font-outfit font-bold text-sm text-gray-900 truncate">Loading...</h4>
+                    <p id="sb-student-major" class="text-xs text-gray-500 truncate">Computer Science</p>
+                </div>
+                <button onclick="openModal('student-modal')" class="w-8 h-8 rounded-full hover:bg-pixel-surfaceContainer flex items-center justify-center text-pixel-primary transition-colors" title="Edit Profile">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Viewport -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-pixel-bg relative">
+        <!-- Top App Bar Header -->
+        <header class="h-16 lg:h-20 border-b border-pixel-border bg-pixel-surface px-6 md:px-8 flex items-center justify-between shrink-0 z-10 shadow-xs">
+            <div class="flex items-center gap-3">
+                <h2 id="page-title" class="font-outfit font-bold text-xl md:text-2xl text-gray-900">Student Overview</h2>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Sync Indicator Button -->
+                <button onclick="app.manualSync()" class="hidden sm:flex items-center gap-2 bg-pixel-surfaceContainer hover:bg-gray-200/70 text-gray-800 px-4 py-2 rounded-full text-xs font-semibold border border-pixel-border transition-colors">
+                    <i class="fa-solid fa-rotate text-pixel-primary" id="sync-icon"></i>
+                    <span>Sync Database</span>
+                </button>
+
+                <!-- Quick Action Button -->
+                <button onclick="openModal('student-modal')" class="flex items-center gap-2 bg-pixel-primary text-white hover:bg-blue-700 px-4 py-2 rounded-full text-xs font-semibold shadow-pixel-sm transition-all">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span class="hidden sm:inline">Edit Profile</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Views Container -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8" id="viewport-container">
+            <div class="max-w-7xl mx-auto space-y-8">
+
+                <!-- ================= VIEW 1: OVERVIEW ================= -->
+                <section id="view-overview" class="view-content space-y-8 fade-in-up">
+                    <!-- Hero Welcome Banner -->
+                    <div class="bg-gradient-to-br from-pixel-primaryContainer via-pixel-secondaryContainer to-pixel-tertiaryContainer p-1 rounded-[32px] shadow-pixel-sm">
+                        <div class="bg-white/70 backdrop-blur-md rounded-[28px] p-6 md:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                            <div class="space-y-2 max-w-2xl">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/60 text-xs font-bold text-pixel-onPrimary">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    <span>Academic Year 2026 - Semester 2</span>
+                                </div>
+                                <h3 id="hero-greeting" class="font-outfit font-bold text-2xl md:text-4xl text-gray-900 tracking-tight">Welcome back, Youssef! 👋</h3>
+                                <p id="hero-subtext" class="text-sm text-gray-700 font-medium leading-relaxed">
+                                    Your academic progress, weekly study commitments, active classes, and free-time breakdown are fully synchronized.
+                                </p>
+                            </div>
+
+                            <!-- KPI Summary Pills -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 w-full lg:w-auto">
+                                <div class="bg-white p-4 rounded-3xl shadow-xs border border-white/80 text-center min-w-[110px]">
+                                    <span id="kpi-study-hours" class="block font-outfit text-2xl font-bold text-pixel-primary">0h</span>
+                                    <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Weekly Study</span>
+                                </div>
+                                <div class="bg-white p-4 rounded-3xl shadow-xs border border-white/80 text-center min-w-[110px]">
+                                    <span id="kpi-courses-count" class="block font-outfit text-2xl font-bold text-pixel-secondary">0</span>
+                                    <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Active Courses</span>
+                                </div>
+                                <div class="bg-white p-4 rounded-3xl shadow-xs border border-white/80 text-center min-w-[110px]">
+                                    <span id="kpi-faculty-count" class="block font-outfit text-2xl font-bold text-pixel-tertiary">0</span>
+                                    <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Instructors</span>
+                                </div>
+                                <div class="bg-white p-4 rounded-3xl shadow-xs border border-white/80 text-center min-w-[110px]">
+                                    <span id="kpi-freetime-hours" class="block font-outfit text-2xl font-bold text-amber-600">0h</span>
+                                    <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Free Time</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid Row: Today's Schedule & Free Time Distribution Chart -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Schedule Column (2 cols) -->
+                        <div class="lg:col-span-2 bg-pixel-surface p-6 rounded-[32px] border border-pixel-border shadow-pixel-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h4 class="font-outfit font-bold text-xl text-gray-900">Today's Class Schedule</h4>
+                                        <p class="text-xs text-gray-500 mt-0.5" id="today-day-label">Active courses for today</p>
+                                    </div>
+                                    <button onclick="switchView('timetable')" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-pixel-primaryContainer text-pixel-onPrimary hover:bg-blue-200 transition-colors">
+                                        View Full Schedule <i class="fa-solid fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="space-y-3" id="overview-today-schedule">
+                                    <!-- Schedule items injected via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Weekly Goal Bar -->
+                            <div class="mt-6 pt-5 border-t border-pixel-border">
+                                <div class="flex justify-between items-center text-xs font-semibold mb-2">
+                                    <span class="text-gray-600">Study Goal Progress</span>
+                                    <span id="study-goal-text" class="text-pixel-primary">0 / 30 hrs</span>
+                                </div>
+                                <div class="w-full h-3 bg-pixel-surfaceContainer rounded-full overflow-hidden">
+                                    <div id="study-goal-bar" class="h-full bg-pixel-primary rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Free Time Chart Column (1 col) -->
+                        <div class="bg-pixel-surface p-6 rounded-[32px] border border-pixel-border shadow-pixel-sm flex flex-col items-center justify-between">
+                            <div class="w-full flex justify-between items-center mb-2">
+                                <div>
+                                    <h4 class="font-outfit font-bold text-xl text-gray-900">Free Time Allocation</h4>
+                                    <p class="text-xs text-gray-500">Weekly non-academic hours</p>
+                                </div>
+                                <button onclick="switchView('freetime')" class="w-8 h-8 rounded-full bg-pixel-surfaceContainer text-gray-600 flex items-center justify-center hover:bg-gray-200">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="relative w-full max-w-[210px] aspect-square my-auto py-2">
+                                <canvas id="overviewChart"></canvas>
+                            </div>
+                            <div class="w-full text-center pt-2 border-t border-pixel-border">
+                                <span class="text-xs text-gray-500 font-medium">Logged Activities Total: <strong id="overview-total-freetime" class="text-gray-900">0h</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Faculty Row Preview -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-outfit font-bold text-xl text-gray-900">Course Faculty Overview</h4>
+                            <button onclick="switchView('faculty')" class="text-xs font-semibold text-pixel-primary hover:underline">
+                                View Faculty Directory →
+                            </button>
+                        </div>
+                        <div id="overview-faculty-preview" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= VIEW 2: WEEKLY TIMETABLE ================= -->
+                <section id="view-timetable" class="view-content hidden space-y-6 fade-in-up">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-outfit font-bold text-2xl text-gray-900">Weekly Class Timetable</h3>
+                            <p class="text-sm text-gray-500">Manage course hours, locations, and assigned instructors.</p>
+                        </div>
+                        <button onclick="openCourseModal()" class="bg-pixel-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-semibold text-sm shadow-pixel-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add New Course</span>
+                        </button>
+                    </div>
+
+                    <!-- Day Selector Pills -->
+                    <div class="flex gap-2 overflow-x-auto pb-2" id="day-filter-pills">
+                        <button onclick="filterScheduleDay('All')" class="day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-primary text-white shadow-xs" data-day="All">All Days</button>
+                        <button onclick="filterScheduleDay('Monday')" class="day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-surfaceContainer text-gray-700 hover:bg-gray-200" data-day="Monday">Monday</button>
+                        <button onclick="filterScheduleDay('Tuesday')" class="day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-surfaceContainer text-gray-700 hover:bg-gray-200" data-day="Tuesday">Tuesday</button>
+                        <button onclick="filterScheduleDay('Wednesday')" class="day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-surfaceContainer text-gray-700 hover:bg-gray-200" data-day="Wednesday">Wednesday</button>
+                        <button onclick="filterScheduleDay('Thursday')" class="day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-surfaceContainer text-gray-700 hover:bg-gray-200" data-day="Thursday">Thursday</button>
+                        <button onclick="filterScheduleDay('Friday')" class="day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-surfaceContainer text-gray-700 hover:bg-gray-200" data-day="Friday">Friday</button>
+                    </div>
+
+                    <!-- Courses Grid -->
+                    <div id="timetable-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- ================= VIEW 3: FACULTY DIRECTORY ================= -->
+                <section id="view-faculty" class="view-content hidden space-y-6 fade-in-up">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-outfit font-bold text-2xl text-gray-900">Faculty & Teachers Directory</h3>
+                            <p class="text-sm text-gray-500">Instructor consultation hours, contact information, and departments.</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <!-- Search Bar -->
+                            <div class="relative flex-1 sm:w-64">
+                                <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                <input type="text" id="faculty-search-input" oninput="app.renderFacultyView()" placeholder="Search instructor or subject..."
+                                    class="w-full bg-pixel-surface border border-pixel-border pl-10 pr-4 py-2.5 rounded-full text-xs font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                            </div>
+
+                            <button onclick="openTeacherModal()" class="bg-pixel-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-semibold text-xs shadow-pixel-sm transition-all shrink-0 flex items-center gap-2">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Add Instructor</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Faculty Grid -->
+                    <div id="faculty-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- ================= VIEW 4: FREE TIME TRACKER ================= -->
+                <section id="view-freetime" class="view-content hidden space-y-6 fade-in-up">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-outfit font-bold text-2xl text-gray-900">Free Time & Hobbies Tracker</h3>
+                            <p class="text-sm text-gray-500">Log sports, gaming, side projects, and reading hours outside of academic schedule.</p>
+                        </div>
+                        <button onclick="openActivityModal()" class="bg-pixel-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-semibold text-sm shadow-pixel-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Log Activity</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Dedicated Chart Box -->
+                        <div class="bg-pixel-surface p-6 rounded-[32px] border border-pixel-border shadow-pixel-sm flex flex-col items-center">
+                            <h4 class="font-outfit font-bold text-lg text-gray-900 w-full text-left mb-1">Weekly Distribution</h4>
+                            <p class="text-xs text-gray-500 w-full text-left mb-4">Hours spent per activity category</p>
+                            
+                            <div class="w-full max-w-[240px] aspect-square relative my-auto">
+                                <canvas id="freetimeDedicatedChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Activity List Cards -->
+                        <div class="lg:col-span-2 bg-pixel-surface p-6 rounded-[32px] border border-pixel-border shadow-pixel-sm flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-outfit font-bold text-lg text-gray-900">Logged Activities</h4>
+                                <span id="activities-count-badge" class="text-xs font-semibold px-3 py-1 rounded-full bg-pixel-tertiaryContainer text-pixel-onTertiary">0 Items</span>
+                            </div>
+
+                            <div class="space-y-3 flex-1 overflow-y-auto max-h-[420px]" id="activities-list-container">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= VIEW 5: DATABASE ENGINE ================= -->
+                <section id="view-database" class="view-content hidden space-y-6 fade-in-up">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-outfit font-bold text-2xl text-gray-900">Database & System State</h3>
+                            <p class="text-sm text-gray-500">Inspect real-time Firestore collections, sync logs, and reset system state.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="app.confirmResetDatabase()" class="bg-pixel-errorContainer hover:bg-red-200 text-pixel-onError px-4 py-2 rounded-full font-semibold text-xs transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reset Default Data</span>
+                            </button>
+                            <button onclick="app.manualSync()" class="bg-pixel-primary hover:bg-blue-700 text-white px-4 py-2 rounded-full font-semibold text-xs transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Force Sync</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Collection Counters Bar -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-pixel-surface p-4 rounded-3xl border border-pixel-border shadow-xs">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Student Docs</span>
+                            <span id="db-cnt-student" class="text-2xl font-outfit font-bold text-pixel-primary">1</span>
+                        </div>
+                        <div class="bg-pixel-surface p-4 rounded-3xl border border-pixel-border shadow-xs">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Faculty Docs</span>
+                            <span id="db-cnt-teachers" class="text-2xl font-outfit font-bold text-pixel-secondary">0</span>
+                        </div>
+                        <div class="bg-pixel-surface p-4 rounded-3xl border border-pixel-border shadow-xs">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Course Docs</span>
+                            <span id="db-cnt-courses" class="text-2xl font-outfit font-bold text-pixel-tertiary">0</span>
+                        </div>
+                        <div class="bg-pixel-surface p-4 rounded-3xl border border-pixel-border shadow-xs">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Activity Docs</span>
+                            <span id="db-cnt-activities" class="text-2xl font-outfit font-bold text-amber-600">0</span>
+                        </div>
+                    </div>
+
+                    <!-- JSON Inspector Box -->
+                    <div class="bg-gray-900 text-gray-200 rounded-[32px] p-6 shadow-xl font-mono text-xs overflow-hidden border border-gray-800">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-800 mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                                <span class="ml-2 font-semibold text-gray-400">firestore_database_dump.json</span>
+                            </div>
+                            <button onclick="app.copyDatabaseJSON()" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg transition-colors text-xs flex items-center gap-1.5">
+                                <i class="fa-regular fa-copy"></i> Copy JSON
+                            </button>
+                        </div>
+                        <pre id="json-dump-view" class="max-h-[380px] overflow-y-auto leading-relaxed text-blue-300">Loading database JSON...</pre>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= MODALS & DIALOGS ================= -->
+
+    <!-- Modal 1: Student Profile Modal -->
+    <div id="student-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity duration-200 opacity-0">
+        <div class="bg-pixel-surface rounded-[32px] w-full max-w-md shadow-pixel-lg p-6 md:p-8 transform transition-transform duration-200 scale-95 modal-card">
+            <div class="w-12 h-12 rounded-2xl bg-pixel-primaryContainer text-pixel-onPrimary flex items-center justify-center mb-4 text-xl">
+                <i class="fa-solid fa-user-pen"></i>
+            </div>
+            <h3 class="font-outfit font-bold text-2xl text-gray-900 mb-1">Edit Student Profile</h3>
+            <p class="text-xs text-gray-500 mb-6">Update profile info synchronized with Firestore.</p>
+
+            <form onsubmit="app.saveStudentProfile(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Full Name</label>
+                    <input type="text" id="m-student-name" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Major / Specialization</label>
+                    <input type="text" id="m-student-major" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Student ID</label>
+                        <input type="text" id="m-student-id" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Study Goal (Hrs/Wk)</label>
+                        <input type="number" id="m-student-goal" min="5" max="80" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4">
+                    <button type="button" onclick="closeModal('student-modal')" class="px-5 py-2.5 rounded-full font-semibold text-xs text-gray-600 hover:bg-gray-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full font-semibold text-xs bg-pixel-primary text-white hover:bg-blue-700 shadow-pixel-sm">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Add/Edit Teacher Modal -->
+    <div id="teacher-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity duration-200 opacity-0">
+        <div class="bg-pixel-surface rounded-[32px] w-full max-w-md shadow-pixel-lg p-6 md:p-8 transform transition-transform duration-200 scale-95 modal-card">
+            <div class="w-12 h-12 rounded-2xl bg-pixel-secondaryContainer text-pixel-onSecondary flex items-center justify-center mb-4 text-xl">
+                <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+            <h3 id="m-teacher-title" class="font-outfit font-bold text-2xl text-gray-900 mb-1">Add Faculty Member</h3>
+            <p class="text-xs text-gray-500 mb-6">Instructor details and consultation schedule.</p>
+
+            <form onsubmit="app.saveTeacher(event)" class="space-y-4">
+                <input type="hidden" id="m-teacher-doc-id">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Instructor Full Name</label>
+                    <input type="text" id="m-teacher-name" placeholder="e.g. Dr. Amina Benali" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Subject</label>
+                        <input type="text" id="m-teacher-subject" placeholder="e.g. Algorithms" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Department</label>
+                        <input type="text" id="m-teacher-dept" placeholder="e.g. CS Dept" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Office Hours</label>
+                    <input type="text" id="m-teacher-office" placeholder="e.g. Mon/Wed 14:00 - 16:00" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Email Address</label>
+                    <input type="email" id="m-teacher-email" placeholder="e.g. teacher@univ.edu" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4">
+                    <button type="button" onclick="closeModal('teacher-modal')" class="px-5 py-2.5 rounded-full font-semibold text-xs text-gray-600 hover:bg-gray-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full font-semibold text-xs bg-pixel-primary text-white hover:bg-blue-700 shadow-pixel-sm">Save Instructor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Add/Edit Course Modal -->
+    <div id="course-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity duration-200 opacity-0">
+        <div class="bg-pixel-surface rounded-[32px] w-full max-w-md shadow-pixel-lg p-6 md:p-8 transform transition-transform duration-200 scale-95 modal-card">
+            <div class="w-12 h-12 rounded-2xl bg-pixel-tertiaryContainer text-pixel-onTertiary flex items-center justify-center mb-4 text-xl">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <h3 id="m-course-title" class="font-outfit font-bold text-2xl text-gray-900 mb-1">Add Course Schedule</h3>
+            <p class="text-xs text-gray-500 mb-6">Schedule timing, classroom location, and instructor.</p>
+
+            <form onsubmit="app.saveCourse(event)" class="space-y-4">
+                <input type="hidden" id="m-course-doc-id">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Code</label>
+                        <input type="text" id="m-course-code" placeholder="CS301" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-3 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Course Title</label>
+                        <input type="text" id="m-course-name" placeholder="Advanced Algorithms" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Day of Week</label>
+                        <select id="m-course-day" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-3 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Classroom / Room</label>
+                        <input type="text" id="m-course-room" placeholder="Lab 3B" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Start Time</label>
+                        <input type="text" id="m-course-start" placeholder="09:00" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">End Time</label>
+                        <input type="text" id="m-course-end" placeholder="11:00" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Instructor</label>
+                    <select id="m-course-teacher" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4">
+                    <button type="button" onclick="closeModal('course-modal')" class="px-5 py-2.5 rounded-full font-semibold text-xs text-gray-600 hover:bg-gray-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full font-semibold text-xs bg-pixel-primary text-white hover:bg-blue-700 shadow-pixel-sm">Save Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Add/Edit Activity Modal -->
+    <div id="activity-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity duration-200 opacity-0">
+        <div class="bg-pixel-surface rounded-[32px] w-full max-w-md shadow-pixel-lg p-6 md:p-8 transform transition-transform duration-200 scale-95 modal-card">
+            <div class="w-12 h-12 rounded-2xl bg-pixel-peachContainer text-pixel-onPeach flex items-center justify-center mb-4 text-xl">
+                <i class="fa-solid fa-icons"></i>
+            </div>
+            <h3 id="m-act-title" class="font-outfit font-bold text-2xl text-gray-900 mb-1">Log Free Time Activity</h3>
+            <p class="text-xs text-gray-500 mb-6">Track non-academic weekly time allocation.</p>
+
+            <form onsubmit="app.saveActivity(event)" class="space-y-4">
+                <input type="hidden" id="m-act-doc-id">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Activity Name</label>
+                    <input type="text" id="m-act-name" placeholder="e.g. Chess & Gaming" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Category</label>
+                        <select id="m-act-cat" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-3 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                            <option value="Tech">Tech & Projects</option>
+                            <option value="Entertainment">Gaming & Media</option>
+                            <option value="Sports">Sports & Gym</option>
+                            <option value="Self-Improvement">Reading & Research</option>
+                            <option value="Arts">Music & Arts</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Hours / Week</label>
+                        <input type="number" id="m-act-hours" min="1" max="40" required class="w-full bg-pixel-surfaceContainer border border-pixel-border px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pixel-primary">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4">
+                    <button type="button" onclick="closeModal('activity-modal')" class="px-5 py-2.5 rounded-full font-semibold text-xs text-gray-600 hover:bg-gray-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full font-semibold text-xs bg-pixel-primary text-white hover:bg-blue-700 shadow-pixel-sm">Save Activity</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 5: Custom Confirmation Dialog (Replaces browser confirm) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity duration-200 opacity-0">
+        <div class="bg-pixel-surface rounded-[32px] w-full max-w-sm shadow-pixel-lg p-6 text-center transform transition-transform duration-200 scale-95 modal-card">
+            <div class="w-12 h-12 rounded-full bg-pixel-errorContainer text-pixel-onError mx-auto flex items-center justify-center mb-4 text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="confirm-title" class="font-outfit font-bold text-xl text-gray-900 mb-2">Are you sure?</h3>
+            <p id="confirm-desc" class="text-xs text-gray-500 mb-6">This action will modify your database state.</p>
+            <div class="flex gap-3 justify-center">
+                <button type="button" onclick="closeModal('confirm-modal')" class="px-5 py-2.5 rounded-full font-semibold text-xs text-gray-600 hover:bg-gray-100">Cancel</button>
+                <button type="button" id="confirm-action-btn" class="px-6 py-2.5 rounded-full font-semibold text-xs bg-red-600 text-white hover:bg-red-700 shadow-pixel-sm">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Popup -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white px-5 py-3.5 rounded-full shadow-pixel-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 text-xs font-semibold">
+        <i class="fa-solid fa-circle-check text-green-400 text-base" id="toast-icon"></i>
+        <span id="toast-message">Database operation completed successfully!</span>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc, 
+            deleteDoc, 
+            onSnapshot, 
+            collection 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const DEFAULT_STUDENT = {
+            id: 'CS-2026-890',
+            name: 'Youssef Amrani',
+            major: 'Computer Science & Data Engineering',
+            studyGoalHours: 30
+        };
+
+        const DEFAULT_TEACHERS = [
+            { id: 'T01', name: 'Dr. Amina Benali', subject: 'Advanced Algorithms', department: 'Computer Science', office: 'Mon/Wed 14:00 - 16:00', email: 'a.benali@univ.edu', color: 'bg-pixel-primaryContainer text-pixel-onPrimary' },
+            { id: 'T02', name: 'Prof. Karim Tazi', subject: 'Distributed Databases', department: 'Software Eng', office: 'Tue/Thu 10:00 - 12:00', email: 'k.tazi@univ.edu', color: 'bg-pixel-secondaryContainer text-pixel-onSecondary' },
+            { id: 'T03', name: 'Dr. Sarah Smith', subject: 'Web Architecture', department: 'Information Tech', office: 'Fri 09:00 - 11:30', email: 's.smith@univ.edu', color: 'bg-pixel-tertiaryContainer text-pixel-onTertiary' },
+            { id: 'T04', name: 'Dr. Mehdi Bennani', subject: 'Data Structures', department: 'Computer Science', office: 'Mon/Thu 15:00 - 17:00', email: 'm.bennani@univ.edu', color: 'bg-pixel-peachContainer text-pixel-onPeach' }
+        ];
+
+        const DEFAULT_COURSES = [
+            { id: 'C01', code: 'CS301', title: 'Advanced Algorithms', day: 'Monday', start: '09:00', end: '11:00', room: 'Lab 3B', teacherId: 'T01' },
+            { id: 'C02', code: 'SE402', title: 'Distributed Databases', day: 'Tuesday', start: '11:15', end: '13:15', room: 'Hall 204', teacherId: 'T02' },
+            { id: 'C03', code: 'IT205', title: 'Web Architecture', day: 'Wednesday', start: '14:00', end: '16:00', room: 'Lab 1A', teacherId: 'T03' },
+            { id: 'C04', code: 'CS202', title: 'Data Structures', day: 'Thursday', start: '10:00', end: '12:00', room: 'Room 102', teacherId: 'T04' },
+            { id: 'C05', code: 'CS301L', title: 'Algorithms Practical Lab', day: 'Friday', start: '09:00', end: '11:00', room: 'Lab 3B', teacherId: 'T01' }
+        ];
+
+        const DEFAULT_ACTIVITIES = [
+            { id: 'ACT01', name: 'Coding Side Projects', category: 'Tech', hours: 12, color: '#1a73e8', icon: 'fa-code' },
+            { id: 'ACT02', name: 'Gaming & Esports', category: 'Entertainment', hours: 8, color: '#6750a4', icon: 'fa-gamepad' },
+            { id: 'ACT03', name: 'Reading & Research', category: 'Self-Improvement', hours: 5, color: '#006874', icon: 'fa-book-open' },
+            { id: 'ACT04', name: 'Football & Gym', category: 'Sports', hours: 6, color: '#c2410c', icon: 'fa-futbol' }
+        ];
+
+        class UniDashboardApp {
+            constructor() {
+                this.appId = typeof __app_id !== 'undefined' ? __app_id : 'pixel-uni-dash';
+                this.db = null;
+                this.auth = null;
+                this.user = null;
+                this.isOnlineSync = false;
+
+                // Local Memory State
+                this.state = {
+                    student: { ...DEFAULT_STUDENT },
+                    teachers: [...DEFAULT_TEACHERS],
+                    courses: [...DEFAULT_COURSES],
+                    activities: [...DEFAULT_ACTIVITIES]
+                };
+
+                // Chart instances
+                this.overviewChart = null;
+                this.dedicatedChart = null;
+
+                // Active Filters
+                this.selectedDayFilter = 'All';
+            }
+
+            async init() {
+                this.loadLocalStorageFallback();
+                this.renderAllViews();
+
+                // Setup Firebase
+                try {
+                    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                    if (firebaseConfig) {
+                        const app = initializeApp(firebaseConfig);
+                        this.db = getFirestore(app);
+                        this.auth = getAuth(app);
+
+                        // Authenticate
+                        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                        if (initialToken) {
+                            await signInWithCustomToken(this.auth, initialToken);
+                        } else {
+                            await signInAnonymously(this.auth);
+                        }
+
+                        onAuthStateChanged(this.auth, (user) => {
+                            if (user) {
+                                this.user = user;
+                                this.isOnlineSync = true;
+                                this.updateSyncStatusBadge(true, "Realtime Firestore Connected");
+                                this.attachFirestoreListeners();
+                            }
+                        });
+                    } else {
+                        this.updateSyncStatusBadge(false, "Local Storage Mode (No Config)");
+                    }
+                } catch (err) {
+                    console.warn("Firestore initialization fallback to LocalStorage:", err);
+                    this.updateSyncStatusBadge(false, "Offline / Local Storage Mode");
+                }
+            }
+
+            updateSyncStatusBadge(isOnline, desc) {
+                const badge = document.getElementById('sync-status-badge');
+                const descEl = document.getElementById('sync-status-desc');
+                descEl.textContent = desc;
+
+                if (isOnline) {
+                    badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800";
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Cloud Realtime`;
+                } else {
+                    badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800";
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span> Local Offline`;
+                }
+            }
+
+            attachFirestoreListeners() {
+                if (!this.db || !this.user) return;
+
+                // Path helper following strict rule 1
+                const getColRef = (colName) => collection(this.db, 'artifacts', this.appId, 'public', 'data', colName);
+
+                // Listener 1: Student Profile
+                onSnapshot(getColRef('student_profile'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        snapshot.forEach(doc => {
+                            if (doc.id === 'main') {
+                                this.state.student = doc.data();
+                            }
+                        });
+                        this.saveLocalStorageFallback();
+                        this.renderAllViews();
+                    } else {
+                        // Seed default if collection is fresh
+                        this.syncDocToFirestore('student_profile', 'main', this.state.student);
+                    }
+                }, (err) => console.error("Snapshot error student_profile:", err));
+
+                // Listener 2: Teachers
+                onSnapshot(getColRef('teachers'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        const items = [];
+                        snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                        this.state.teachers = items;
+                        this.saveLocalStorageFallback();
+                        this.renderAllViews();
+                    } else {
+                        this.state.teachers.forEach(t => this.syncDocToFirestore('teachers', t.id, t));
+                    }
+                }, (err) => console.error("Snapshot error teachers:", err));
+
+                // Listener 3: Courses
+                onSnapshot(getColRef('courses'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        const items = [];
+                        snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                        this.state.courses = items;
+                        this.saveLocalStorageFallback();
+                        this.renderAllViews();
+                    } else {
+                        this.state.courses.forEach(c => this.syncDocToFirestore('courses', c.id, c));
+                    }
+                }, (err) => console.error("Snapshot error courses:", err));
+
+                // Listener 4: Activities
+                onSnapshot(getColRef('free_time_activities'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        const items = [];
+                        snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                        this.state.activities = items;
+                        this.saveLocalStorageFallback();
+                        this.renderAllViews();
+                    } else {
+                        this.state.activities.forEach(a => this.syncDocToFirestore('free_time_activities', a.id, a));
+                    }
+                }, (err) => console.error("Snapshot error free_time_activities:", err));
+            }
+
+            async syncDocToFirestore(colName, docId, data) {
+                if (!this.db || !this.user) return;
+                try {
+                    const docRef = doc(this.db, 'artifacts', this.appId, 'public', 'data', colName, docId);
+                    await setDoc(docRef, data, { merge: true });
+                } catch (e) {
+                    console.error(`Failed to sync ${colName}/${docId} to Firestore:`, e);
+                }
+            }
+
+            async deleteDocFromFirestore(colName, docId) {
+                if (!this.db || !this.user) return;
+                try {
+                    const docRef = doc(this.db, 'artifacts', this.appId, 'public', 'data', colName, docId);
+                    await deleteDoc(docRef);
+                } catch (e) {
+                    console.error(`Failed to delete ${colName}/${docId}:`, e);
+                }
+            }
+
+            saveLocalStorageFallback() {
+                localStorage.setItem('pixel_student_dash_v2', JSON.stringify(this.state));
+            }
+
+            loadLocalStorageFallback() {
+                const stored = localStorage.getItem('pixel_student_dash_v2');
+                if (stored) {
+                    try {
+                        this.state = JSON.parse(stored);
+                    } catch (e) {
+                        console.error("Localstorage parse error:", e);
+                    }
+                }
+            }
+
+            renderAllViews() {
+                this.renderSidebarStudent();
+                this.renderOverviewView();
+                this.renderTimetableGrid();
+                this.renderFacultyView();
+                this.renderFreeTimeView();
+                this.renderDatabaseView();
+            }
+
+            renderSidebarStudent() {
+                document.getElementById('sb-student-name').textContent = this.state.student.name;
+                document.getElementById('sb-student-major').textContent = this.state.student.major;
+            }
+
+            renderOverviewView() {
+                const s = this.state.student;
+                document.getElementById('hero-greeting').textContent = `Welcome back, ${s.name.split(' ')[0]}! 👋`;
+                document.getElementById('hero-subtext').textContent = `Major: ${s.major} | ID: ${s.id}`;
+
+                // Calculate total study hours (rough estimate from course time start/end)
+                let totalStudyHrs = 0;
+                this.state.courses.forEach(c => {
+                    const [h1, m1] = c.start.split(':').map(Number);
+                    const [h2, m2] = c.end.split(':').map(Number);
+                    const duration = (h2 + m2/60) - (h1 + m1/60);
+                    if (duration > 0) totalStudyHrs += duration;
+                });
+                totalStudyHrs = Math.round(totalStudyHrs * 10) / 10;
+
+                const totalFreeHrs = this.state.activities.reduce((acc, a) => acc + (Number(a.hours) || 0), 0);
+
+                document.getElementById('kpi-study-hours').textContent = `${totalStudyHrs}h`;
+                document.getElementById('kpi-courses-count').textContent = this.state.courses.length;
+                document.getElementById('kpi-faculty-count').textContent = this.state.teachers.length;
+                document.getElementById('kpi-freetime-hours').textContent = `${totalFreeHrs}h`;
+
+                // Progress goal
+                const goal = s.studyGoalHours || 30;
+                const pct = Math.min(100, Math.round((totalStudyHrs / goal) * 100));
+                document.getElementById('study-goal-text').textContent = `${totalStudyHrs} / ${goal} hrs (${pct}%)`;
+                document.getElementById('study-goal-bar').style.width = `${pct}%`;
+
+                // Today's schedule list
+                const scheduleContainer = document.getElementById('overview-today-schedule');
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const todayName = days[new Date().getDay()];
+                document.getElementById('today-day-label').textContent = `Schedule for ${todayName}`;
+
+                const todayCourses = this.state.courses.filter(c => c.day === todayName || todayName === 'Sunday' || todayName === 'Saturday');
+                
+                if (todayCourses.length === 0) {
+                    scheduleContainer.innerHTML = `
+                        <div class="p-6 text-center bg-pixel-surfaceContainer rounded-2xl text-gray-500 text-xs font-medium">
+                            <i class="fa-solid fa-mug-hot text-2xl text-gray-400 mb-2 block"></i>
+                            No classes scheduled for today! Enjoy your free time.
+                        </div>
+                    `;
+                } else {
+                    scheduleContainer.innerHTML = todayCourses.map(c => {
+                        const teacher = this.state.teachers.find(t => t.id === c.teacherId) || { name: 'Faculty Instructor' };
+                        return `
+                            <div class="p-4 rounded-2xl bg-pixel-surfaceContainer border border-pixel-border flex items-center justify-between transition-all hover:bg-gray-100">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-10 h-10 rounded-2xl bg-pixel-primaryContainer text-pixel-onPrimary flex items-center justify-center font-bold text-xs">
+                                        <i class="fa-solid fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[11px] font-bold text-pixel-primary bg-white px-2.5 py-0.5 rounded-full border border-pixel-border">${c.start} - ${c.end}</span>
+                                        <h5 class="font-outfit font-bold text-sm text-gray-900 mt-1">${c.title} (${c.code})</h5>
+                                        <p class="text-xs text-gray-500">${teacher.name} • Room ${c.room}</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-white text-gray-700 border border-pixel-border">${c.day}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // Faculty Preview Row
+                const facultyPreview = document.getElementById('overview-faculty-preview');
+                facultyPreview.innerHTML = this.state.teachers.slice(0, 3).map(t => `
+                    <div class="bg-pixel-surface p-4 rounded-2xl border border-pixel-border flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl ${t.color || 'bg-pixel-primaryContainer text-pixel-onPrimary'} flex items-center justify-center font-bold font-outfit text-sm">
+                            ${t.name.charAt(0)}
+                        </div>
+                        <div class="overflow-hidden">
+                            <h5 class="font-outfit font-bold text-sm text-gray-900 truncate">${t.name}</h5>
+                            <p class="text-xs text-pixel-primary font-semibold truncate">${t.subject}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Render Chart
+                this.renderDoughnutChart('overviewChart', this.state.activities);
+                document.getElementById('overview-total-freetime').textContent = `${totalFreeHrs} hrs/week`;
+            }
+
+            renderTimetableGrid() {
+                const grid = document.getElementById('timetable-grid');
+                let filtered = this.state.courses;
+                if (this.selectedDayFilter !== 'All') {
+                    filtered = filtered.filter(c => c.day === this.selectedDayFilter);
+                }
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full bg-pixel-surface p-8 rounded-[32px] border border-pixel-border text-center text-gray-500">
+                            <i class="fa-solid fa-calendar-xmark text-3xl text-gray-400 mb-2 block"></i>
+                            <p class="font-outfit font-bold text-base text-gray-800">No courses scheduled for this filter.</p>
+                            <p class="text-xs mt-1">Click "Add New Course" above to create one.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = filtered.map(c => {
+                    const teacher = this.state.teachers.find(t => t.id === c.teacherId) || { name: 'Unassigned Instructor' };
+                    return `
+                        <div class="bg-pixel-surface p-6 rounded-[28px] border border-pixel-border shadow-pixel-sm hover:shadow-pixel-md transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between mb-3">
+                                    <span class="text-xs font-bold text-pixel-primary bg-pixel-primaryContainer px-3 py-1 rounded-full">${c.code}</span>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="openCourseModal('${c.id}')" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-pixel-primary transition-colors">
+                                            <i class="fa-solid fa-pen text-xs"></i>
+                                        </button>
+                                        <button onclick="app.deleteCourse('${c.id}')" class="w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors">
+                                            <i class="fa-solid fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-outfit font-bold text-lg text-gray-900">${c.title}</h4>
+                                <p class="text-xs font-semibold text-gray-500 mt-1"><i class="fa-solid fa-user-graduate mr-1"></i> ${teacher.name}</p>
+                            </div>
+
+                            <div class="mt-5 pt-4 border-t border-pixel-border flex items-center justify-between text-xs font-medium text-gray-600">
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-pixel-primary"></i> ${c.day}, ${c.start} - ${c.end}</span>
+                                <span class="bg-pixel-surfaceContainer px-2.5 py-1 rounded-lg text-gray-800 font-bold"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> ${c.room}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderFacultyView() {
+                const grid = document.getElementById('faculty-grid');
+                const query = (document.getElementById('faculty-search-input')?.value || '').toLowerCase();
+
+                let filtered = this.state.teachers.filter(t => 
+                    t.name.toLowerCase().includes(query) || 
+                    t.subject.toLowerCase().includes(query) ||
+                    t.department.toLowerCase().includes(query)
+                );
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full bg-pixel-surface p-8 rounded-[32px] border border-pixel-border text-center text-gray-500">
+                            <i class="fa-solid fa-user-slash text-3xl text-gray-400 mb-2 block"></i>
+                            <p class="font-outfit font-bold text-base text-gray-800">No instructors match your search criteria.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = filtered.map(t => {
+                    const coursesTaught = this.state.courses.filter(c => c.teacherId === t.id);
+                    return `
+                        <div class="bg-pixel-surface p-6 rounded-[28px] border border-pixel-border shadow-pixel-sm hover:shadow-pixel-md transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-2xl ${t.color || 'bg-pixel-primaryContainer text-pixel-onPrimary'} flex items-center justify-center font-bold font-outfit text-xl shadow-xs">
+                                        ${t.name.charAt(0)}
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="openTeacherModal('${t.id}')" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-pixel-primary transition-colors">
+                                            <i class="fa-solid fa-pen text-xs"></i>
+                                        </button>
+                                        <button onclick="app.deleteTeacher('${t.id}')" class="w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors">
+                                            <i class="fa-solid fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-outfit font-bold text-lg text-gray-900">${t.name}</h4>
+                                <span class="inline-block text-xs font-semibold text-pixel-primary bg-pixel-primaryContainer px-2.5 py-0.5 rounded-full mt-1">${t.subject}</span>
+                                <p class="text-xs text-gray-500 mt-1">${t.department}</p>
+                            </div>
+
+                            <div class="mt-5 pt-4 border-t border-pixel-border space-y-2 text-xs text-gray-600">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-regular fa-clock text-gray-400 w-4"></i>
+                                    <span>Office Hours: <strong>${t.office}</strong></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-regular fa-envelope text-gray-400 w-4"></i>
+                                    <span class="truncate">${t.email}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-book text-gray-400 w-4"></i>
+                                    <span>Courses: <strong>${coursesTaught.length} Active</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderFreeTimeView() {
+                const container = document.getElementById('activities-list-container');
+                const badge = document.getElementById('activities-count-badge');
+                badge.textContent = `${this.state.activities.length} Items`;
+
+                if (this.state.activities.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center text-gray-500 bg-pixel-surfaceContainer rounded-2xl">
+                            <i class="fa-solid fa-icons text-3xl text-gray-400 mb-2 block"></i>
+                            No free time activities logged yet.
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = this.state.activities.map(a => `
+                        <div class="p-4 rounded-2xl bg-pixel-surfaceContainer border border-pixel-border flex items-center justify-between transition-all hover:bg-gray-100">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-10 h-10 rounded-2xl bg-white text-pixel-primary flex items-center justify-center font-bold text-base shadow-xs">
+                                    <i class="fa-solid ${a.icon || 'fa-star'}"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-outfit font-bold text-sm text-gray-900">${a.name}</h5>
+                                    <span class="text-[11px] font-semibold text-gray-500 bg-white px-2 py-0.5 rounded-md border border-pixel-border inline-block mt-0.5">${a.category}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <span class="font-outfit font-bold text-base text-pixel-primary">${a.hours}h</span>
+                                    <span class="block text-[10px] text-gray-400">per week</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="openActivityModal('${a.id}')" class="w-8 h-8 rounded-full hover:bg-white flex items-center justify-center text-gray-500 hover:text-pixel-primary">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button onclick="app.deleteActivity('${a.id}')" class="w-8 h-8 rounded-full hover:bg-red-100 flex items-center justify-center text-gray-500 hover:text-red-600">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                this.renderDoughnutChart('freetimeDedicatedChart', this.state.activities);
+            }
+
+            renderDatabaseView() {
+                document.getElementById('db-cnt-student').textContent = '1';
+                document.getElementById('db-cnt-teachers').textContent = this.state.teachers.length;
+                document.getElementById('db-cnt-courses').textContent = this.state.courses.length;
+                document.getElementById('db-cnt-activities').textContent = this.state.activities.length;
+
+                const jsonDump = JSON.stringify(this.state, null, 2);
+                document.getElementById('json-dump-view').textContent = jsonDump;
+            }
+
+            renderDoughnutChart(canvasId, activities) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                if (canvasId === 'overviewChart' && this.overviewChart) this.overviewChart.destroy();
+                if (canvasId === 'freetimeDedicatedChart' && this.dedicatedChart) this.dedicatedChart.destroy();
+
+                const labels = activities.map(a => a.name);
+                const data = activities.map(a => Number(a.hours) || 0);
+                const colors = ['#1a73e8', '#6750a4', '#006874', '#c2410c', '#e8def8', '#fdedc8'];
+
+                const chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors.slice(0, activities.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 10,
+                                    font: { family: 'Inter', size: 10 }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (canvasId === 'overviewChart') this.overviewChart = chart;
+                if (canvasId === 'freetimeDedicatedChart') this.dedicatedChart = chart;
+            }
+
+            saveStudentProfile(e) {
+                e.preventDefault();
+                const name = document.getElementById('m-student-name').value.trim();
+                const major = document.getElementById('m-student-major').value.trim();
+                const id = document.getElementById('m-student-id').value.trim();
+                const goal = parseInt(document.getElementById('m-student-goal').value) || 30;
+
+                this.state.student = { id, name, major, studyGoalHours: goal };
+                this.syncDocToFirestore('student_profile', 'main', this.state.student);
+                this.saveLocalStorageFallback();
+                this.renderAllViews();
+                closeModal('student-modal');
+                showToast("Student profile updated successfully!");
+            }
+
+            saveTeacher(e) {
+                e.preventDefault();
+                const docId = document.getElementById('m-teacher-doc-id').value || 'T' + Date.now().toString().slice(-4);
+                const name = document.getElementById('m-teacher-name').value.trim();
+                const subject = document.getElementById('m-teacher-subject').value.trim();
+                const department = document.getElementById('m-teacher-dept').value.trim();
+                const office = document.getElementById('m-teacher-office').value.trim();
+                const email = document.getElementById('m-teacher-email').value.trim();
+
+                const colors = [
+                    'bg-pixel-primaryContainer text-pixel-onPrimary',
+                    'bg-pixel-secondaryContainer text-pixel-onSecondary',
+                    'bg-pixel-tertiaryContainer text-pixel-onTertiary',
+                    'bg-pixel-peachContainer text-pixel-onPeach'
+                ];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                const teacherData = { id: docId, name, subject, department, office, email, color };
+
+                const idx = this.state.teachers.findIndex(t => t.id === docId);
+                if (idx >= 0) {
+                    this.state.teachers[idx] = teacherData;
+                } else {
+                    this.state.teachers.push(teacherData);
+                }
+
+                this.syncDocToFirestore('teachers', docId, teacherData);
+                this.saveLocalStorageFallback();
+                this.renderAllViews();
+                closeModal('teacher-modal');
+                showToast("Faculty member saved successfully!");
+            }
+
+            deleteTeacher(id) {
+                showConfirmModal("Delete Faculty Member", "This will remove the teacher from your directory.", () => {
+                    this.state.teachers = this.state.teachers.filter(t => t.id !== id);
+                    this.deleteDocFromFirestore('teachers', id);
+                    this.saveLocalStorageFallback();
+                    this.renderAllViews();
+                    showToast("Instructor deleted.");
+                });
+            }
+
+            saveCourse(e) {
+                e.preventDefault();
+                const docId = document.getElementById('m-course-doc-id').value || 'C' + Date.now().toString().slice(-4);
+                const code = document.getElementById('m-course-code').value.trim();
+                const title = document.getElementById('m-course-name').value.trim();
+                const day = document.getElementById('m-course-day').value;
+                const room = document.getElementById('m-course-room').value.trim();
+                const start = document.getElementById('m-course-start').value.trim();
+                const end = document.getElementById('m-course-end').value.trim();
+                const teacherId = document.getElementById('m-course-teacher').value;
+
+                const courseData = { id: docId, code, title, day, room, start, end, teacherId };
+
+                const idx = this.state.courses.findIndex(c => c.id === docId);
+                if (idx >= 0) {
+                    this.state.courses[idx] = courseData;
+                } else {
+                    this.state.courses.push(courseData);
+                }
+
+                this.syncDocToFirestore('courses', docId, courseData);
+                this.saveLocalStorageFallback();
+                this.renderAllViews();
+                closeModal('course-modal');
+                showToast("Course schedule saved!");
+            }
+
+            deleteCourse(id) {
+                showConfirmModal("Delete Course", "Are you sure you want to remove this course schedule?", () => {
+                    this.state.courses = this.state.courses.filter(c => c.id !== id);
+                    this.deleteDocFromFirestore('courses', id);
+                    this.saveLocalStorageFallback();
+                    this.renderAllViews();
+                    showToast("Course removed from schedule.");
+                });
+            }
+
+            saveActivity(e) {
+                e.preventDefault();
+                const docId = document.getElementById('m-act-doc-id').value || 'ACT' + Date.now().toString().slice(-4);
+                const name = document.getElementById('m-act-name').value.trim();
+                const category = document.getElementById('m-act-cat').value;
+                const hours = parseInt(document.getElementById('m-act-hours').value) || 1;
+
+                let icon = 'fa-star';
+                if (category === 'Tech') icon = 'fa-code';
+                else if (category === 'Entertainment') icon = 'fa-gamepad';
+                else if (category === 'Sports') icon = 'fa-futbol';
+                else if (category === 'Self-Improvement') icon = 'fa-book-open';
+                else if (category === 'Arts') icon = 'fa-palette';
+
+                const actData = { id: docId, name, category, hours, icon };
+
+                const idx = this.state.activities.findIndex(a => a.id === docId);
+                if (idx >= 0) {
+                    this.state.activities[idx] = actData;
+                } else {
+                    this.state.activities.push(actData);
+                }
+
+                this.syncDocToFirestore('free_time_activities', docId, actData);
+                this.saveLocalStorageFallback();
+                this.renderAllViews();
+                closeModal('activity-modal');
+                showToast("Free time activity logged!");
+            }
+
+            deleteActivity(id) {
+                showConfirmModal("Delete Activity", "Remove this activity from your free-time tracker?", () => {
+                    this.state.activities = this.state.activities.filter(a => a.id !== id);
+                    this.deleteDocFromFirestore('free_time_activities', id);
+                    this.saveLocalStorageFallback();
+                    this.renderAllViews();
+                    showToast("Activity deleted.");
+                });
+            }
+
+            confirmResetDatabase() {
+                showConfirmModal("Reset Database to Default", "This will restore default courses, faculty, and student profile.", () => {
+                    this.state = {
+                        student: { ...DEFAULT_STUDENT },
+                        teachers: [...DEFAULT_TEACHERS],
+                        courses: [...DEFAULT_COURSES],
+                        activities: [...DEFAULT_ACTIVITIES]
+                    };
+
+                    this.saveLocalStorageFallback();
+                    if (this.db && this.user) {
+                        this.syncDocToFirestore('student_profile', 'main', this.state.student);
+                        this.state.teachers.forEach(t => this.syncDocToFirestore('teachers', t.id, t));
+                        this.state.courses.forEach(c => this.syncDocToFirestore('courses', c.id, c));
+                        this.state.activities.forEach(a => this.syncDocToFirestore('free_time_activities', a.id, a));
+                    }
+                    this.renderAllViews();
+                    showToast("Database restored to defaults!");
+                });
+            }
+
+            manualSync() {
+                const icon = document.getElementById('sync-icon');
+                if (icon) icon.classList.add('fa-spin');
+                
+                this.saveLocalStorageFallback();
+                if (this.db && this.user) {
+                    this.syncDocToFirestore('student_profile', 'main', this.state.student);
+                    this.state.teachers.forEach(t => this.syncDocToFirestore('teachers', t.id, t));
+                    this.state.courses.forEach(c => this.syncDocToFirestore('courses', c.id, c));
+                    this.state.activities.forEach(a => this.syncDocToFirestore('free_time_activities', a.id, a));
+                }
+
+                setTimeout(() => {
+                    if (icon) icon.classList.remove('fa-spin');
+                    showToast("Manual sync complete!");
+                }, 600);
+            }
+
+            copyDatabaseJSON() {
+                const text = JSON.stringify(this.state, null, 2);
+                const area = document.createElement('textarea');
+                area.value = text;
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                document.body.removeChild(area);
+                showToast("Database JSON copied to clipboard!");
+            }
+        }
+
+        window.app = new UniDashboardApp();
+
+        window.switchView = function(viewId) {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-pixel-primaryContainer', 'text-pixel-onPrimary', 'font-semibold', 'shadow-xs');
+                btn.classList.add('text-gray-600', 'hover:bg-white/80');
+            });
+
+            const activeBtn = document.querySelector(`[data-view="${viewId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-600', 'hover:bg-white/80');
+                activeBtn.classList.add('bg-pixel-primaryContainer', 'text-pixel-onPrimary', 'font-semibold', 'shadow-xs');
+            }
+
+            const titles = {
+                overview: "Student Overview",
+                timetable: "Weekly Timetable",
+                faculty: "Faculty Directory",
+                freetime: "Free Time Tracker",
+                database: "Database Engine & JSON"
+            };
+            document.getElementById('page-title').textContent = titles[viewId] || "Student Overview";
+
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar.classList.contains('translate-x-0') && window.innerWidth < 768) {
+                toggleMobileSidebar();
+            }
+        };
+
+        window.toggleMobileSidebar = function() {
+            const sidebar = document.getElementById('app-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            sidebar.classList.toggle('translate-x-0');
+            backdrop.classList.toggle('hidden');
+        };
+
+        window.filterScheduleDay = function(day) {
+            window.app.selectedDayFilter = day;
+            document.querySelectorAll('.day-pill').forEach(btn => {
+                if (btn.dataset.day === day) {
+                    btn.className = "day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-primary text-white shadow-xs";
+                } else {
+                    btn.className = "day-pill px-5 py-2 rounded-full font-semibold text-xs transition-all bg-pixel-surfaceContainer text-gray-700 hover:bg-gray-200";
+                }
+            });
+            window.app.renderTimetableGrid();
+        };
+
+        // Modal triggers
+        window.openModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+
+            // Fill student modal default if opening
+            if (modalId === 'student-modal') {
+                const s = window.app.state.student;
+                document.getElementById('m-student-name').value = s.name;
+                document.getElementById('m-student-major').value = s.major;
+                document.getElementById('m-student-id').value = s.id;
+                document.getElementById('m-student-goal').value = s.studyGoalHours || 30;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                const card = modal.querySelector('.modal-card');
+                if (card) {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }
+            }, 10);
+        };
+
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+
+            const card = modal.querySelector('.modal-card');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            modal.classList.add('opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+        };
+
+        window.openTeacherModal = function(docId = null) {
+            document.getElementById('m-teacher-doc-id').value = docId || '';
+            const title = document.getElementById('m-teacher-title');
+
+            if (docId) {
+                title.textContent = "Edit Faculty Member";
+                const t = window.app.state.teachers.find(item => item.id === docId);
+                if (t) {
+                    document.getElementById('m-teacher-name').value = t.name;
+                    document.getElementById('m-teacher-subject').value = t.subject;
+                    document.getElementById('m-teacher-dept').value = t.department;
+                    document.getElementById('m-teacher-office').value = t.office;
+                    document.getElementById('m-teacher-email').value = t.email;
+                }
+            } else {
+                title.textContent = "Add Faculty Member";
+                document.getElementById('m-teacher-name').value = '';
+                document.getElementById('m-teacher-subject').value = '';
+                document.getElementById('m-teacher-dept').value = '';
+                document.getElementById('m-teacher-office').value = '';
+                document.getElementById('m-teacher-email').value = '';
+            }
+
+            openModal('teacher-modal');
+        };
+
+        window.openCourseModal = function(docId = null) {
+            document.getElementById('m-course-doc-id').value = docId || '';
+            const title = document.getElementById('m-course-title');
+
+            // Populate teacher select options
+            const teacherSelect = document.getElementById('m-course-teacher');
+            teacherSelect.innerHTML = window.app.state.teachers.map(t => `<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
+
+            if (docId) {
+                title.textContent = "Edit Course Schedule";
+                const c = window.app.state.courses.find(item => item.id === docId);
+                if (c) {
+                    document.getElementById('m-course-code').value = c.code;
+                    document.getElementById('m-course-name').value = c.title;
+                    document.getElementById('m-course-day').value = c.day;
+                    document.getElementById('m-course-room').value = c.room;
+                    document.getElementById('m-course-start').value = c.start;
+                    document.getElementById('m-course-end').value = c.end;
+                    document.getElementById('m-course-teacher').value = c.teacherId;
+                }
+            } else {
+                title.textContent = "Add Course Schedule";
+                document.getElementById('m-course-code').value = '';
+                document.getElementById('m-course-name').value = '';
+                document.getElementById('m-course-room').value = '';
+                document.getElementById('m-course-start').value = '09:00';
+                document.getElementById('m-course-end').value = '11:00';
+            }
+
+            openModal('course-modal');
+        };
+
+        window.openActivityModal = function(docId = null) {
+            document.getElementById('m-act-doc-id').value = docId || '';
+            const title = document.getElementById('m-act-title');
+
+            if (docId) {
+                title.textContent = "Edit Free Time Activity";
+                const a = window.app.state.activities.find(item => item.id === docId);
+                if (a) {
+                    document.getElementById('m-act-name').value = a.name;
+                    document.getElementById('m-act-cat').value = a.category;
+                    document.getElementById('m-act-hours').value = a.hours;
+                }
+            } else {
+                title.textContent = "Log Free Time Activity";
+                document.getElementById('m-act-name').value = '';
+                document.getElementById('m-act-hours').value = '4';
+            }
+
+            openModal('activity-modal');
+        };
+
+        window.showConfirmModal = function(titleText, descText, actionFn) {
+            document.getElementById('confirm-title').textContent = titleText;
+            document.getElementById('confirm-desc').textContent = descText;
+
+            const btn = document.getElementById('confirm-action-btn');
+            btn.onclick = () => {
+                closeModal('confirm-modal');
+                actionFn();
+            };
+
+            openModal('confirm-modal');
+        };
+
+        window.showToast = function(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        };
+
+        // Initialize App on DOM load
+        window.addEventListener('DOMContentLoaded', () => {
+            window.app.init();
+        });
+    </script>
+</body>
+</html>
